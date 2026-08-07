@@ -1,0 +1,24 @@
+# Gowin EDA build output.
+# Excluded deliberately: these are regenerable, ~90 MB, and the logs and
+# reports embed absolute paths from the machine that built them.
+*/impl/
+*.fs
+*.pr
+*.gpj
+
+# Icarus Verilog simulation output
+*.vvp
+*.vcd
+
+# Sipeed's upstream example repo — cloned separately, not vendored here:
+#   git clone https://github.com/sipeed/TangPrimer-25K-example
+TangPrimer-25K-example/
+
+# Original phone photos are kept outside the repo (they carry GPS EXIF).
+# Only the cropped, metadata-stripped copies in photos/images/ are committed.
+
+# OS / editor noise
+.DS_Store
+*~
+.vscode/
+.idea/

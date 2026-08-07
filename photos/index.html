@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tang Primer 25K bench &mdash; labelled parts photos</title>
+<style>
+:root {
+  --bg: #ffffff; --fg: #1a1c1f; --muted: #5c6470; --line: #e3e6ea;
+  --card: #f7f8fa; --accent: #b3541e; --code-bg: #eceff3;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161a; --fg: #e6e8ec; --muted: #9aa3b0; --line: #272b32;
+    --card: #1b1e24; --accent: #e08a4e; --code-bg: #23272e;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+header { border-bottom: 2px solid var(--line); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+h1 { font-size: 1.9rem; margin: 0 0 .4rem; letter-spacing: -.02em; }
+.sub { color: var(--muted); margin: 0 0 1rem; }
+.lede { max-width: 62ch; }
+nav { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.25rem; }
+nav a {
+  font-size: .82rem; text-decoration: none; color: var(--fg);
+  border: 1px solid var(--line); border-radius: 999px; padding: .3rem .8rem;
+  background: var(--card);
+}
+nav a:hover { border-color: var(--accent); color: var(--accent); }
+section { margin: 3rem 0 0; scroll-margin-top: 1rem; }
+h2 {
+  font-size: 1.3rem; margin: 0 0 .3rem; padding-bottom: .5rem;
+  border-bottom: 1px solid var(--line);
+}
+.sec-note { color: var(--muted); margin: .5rem 0 1.5rem; max-width: 62ch; font-size: .95rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+figure {
+  margin: 0; background: var(--card); border: 1px solid var(--line);
+  border-radius: 10px; overflow: hidden; display: flex; flex-direction: column;
+}
+figure img {
+  width: 100%; height: auto; display: block; background: #0c0d10;
+  aspect-ratio: 4 / 3; object-fit: cover;
+}
+figcaption { padding: .9rem 1rem 1.1rem; }
+figcaption h3 { font-size: 1rem; margin: 0 0 .45rem; line-height: 1.35; }
+figcaption p { margin: 0 0 .7rem; font-size: .9rem; color: var(--fg); }
+.fname {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .74rem; color: var(--muted); word-break: break-all;
+  border-top: 1px solid var(--line); padding-top: .6rem; margin: 0;
+}
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .87em; background: var(--code-bg); padding: .08em .35em; border-radius: 4px;
+}
+.callout {
+  border-left: 3px solid var(--accent); background: var(--card);
+  padding: .9rem 1.1rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0;
+  max-width: 70ch; font-size: .93rem;
+}
+footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--line);
+         color: var(--muted); font-size: .85rem; }
+a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Tang Primer 25K bench &mdash; labelled parts</h1>
+    <p class="sub">86 photos, cropped to their subject and renamed to say what they are.</p>
+    <div class="lede">
+      <p>Every image below was pulled from the phone dump, cropped down to the
+      part itself, and written out under a descriptive filename. The originals
+      are untouched. Ordering follows what the bench is actually for: the FPGA
+      first, then the things that move and the electronics that drive them,
+      then the supporting parts.</p>
+    </div>
+    <nav>
+      <a href="#fpga">FPGA &ndash; Tang Primer 25K</a>
+      <a href="#motor">Motors &amp; motor controllers</a>
+      <a href="#servo">Servos &amp; the PWM bench rig</a>
+      <a href="#interface">Logic glue &ndash; level shifting, expansion, ADC</a>
+      <a href="#sensor">Sensors &amp; modules</a>
+      <a href="#discrete">Discrete semiconductors &amp; switches</a>
+      <a href="#passive">Passives</a>
+      <a href="#power">Power &amp; test gear</a>
+    </nav>
+  </header>
+
+  <div class="callout">
+    <strong>One thing worth flagging.</strong> The Verilog in
+    <code>motor/src/motor.v</code> is written against a <strong>DRV8833</strong>
+    H-bridge (<code>IN1</code>/<code>IN2</code> on pins <code>G5</code>/<code>F5</code>),
+    but there is no DRV8833 in these photos. What is here is a
+    <strong>DRV8301 three-phase BLDC stage</strong>, an <strong>L293D</strong>
+    DIP H-bridge and a <strong>ULN2003</strong> unipolar stepper board. The
+    L293D is the closest drop-in for that code &mdash; its two enable pins take
+    the PWM and its direction pins replace IN1/IN2 &mdash; while the DRV8301 is
+    a different job entirely and needs six PWM inputs, not two.
+  </div>
+
+    <section id="fpga">
+      <h2>FPGA &mdash; Tang Primer 25K</h2>
+      <p class="sec-note">The Gowin GW5A-25 core module and its dock. Everything else in this set exists to be driven from these pins. <em>(3 photos)</em></p>
+      <div class="grid">
+      <figure>
+        <img src="images/fpga-01-tang-primer-25k-on-dock-with-level-shifter.jpg" alt="Tang Primer 25K seated on its dock" loading="lazy">
+        <figcaption>
+          <h3>Tang Primer 25K seated on its dock</h3>
+          <p>The Sipeed Tang Primer 25K core module (Gowin GW5A-25 FPGA, the square die in the middle) plugged into the Tang Primer 25K Dock. Visible on the dock: the USB-A host port, the USB-C debug/programming port, the on-board USB-Debugger, buttons S1/S2, and the two 220&nbsp;uF bulk caps. The blue board to the right is the TXS0108E level shifter; the FPGA I/O banks here run at 3.3&nbsp;V, so anything at 5&nbsp;V has to go through it.</p>
+          <p class="fname">fpga-01-tang-primer-25k-on-dock-with-level-shifter.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/fpga-02-tang-primer-25k-dock-underside-pin-labels.jpg" alt="Dock underside - the pin-name silkscreen" loading="lazy">
+        <figcaption>
+          <h3>Dock underside &mdash; the pin-name silkscreen</h3>
+          <p>The most useful photo in the set for wiring. Sipeed prints every header pin's FPGA ball name on the back of the dock, which is how you turn a name in a <code>.cst</code> file into a physical hole. <strong>This settles the open question in <code>motor/src/motor.cst</code>:</strong> the motor pins <code>F5</code> and <code>G5</code> are the first column of the bottom-right 6&times;2 header &mdash; <code>F5</code> on the top row, <code>G5</code> directly below it, with that header continuing <code>G7 H8 H5 GND</code> along the top and <code>G8 H7 J5 GND 3V3</code> along the bottom. Also visible: the Debug block (<code>3V3 / GND / TCK / TMS / TDI / TDO</code>) and the <code>Rcfg / GND / Rdy / Done</code> pads.</p>
+          <p class="fname">fpga-02-tang-primer-25k-dock-underside-pin-labels.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/fpga-03-tang-primer-25k-dock-wired-to-breadboard.jpg" alt="Dock jumpered out to a breadboard" loading="lazy">
+        <figcaption>
+          <h3>Dock jumpered out to a breadboard</h3>
+          <p>The dock on the right, four jumpers running to a solderless breadboard carrying the discrete driver circuit. This is the working arrangement for the PWM and motor lessons &mdash; the FPGA generates the switching waveform, the breadboard does the current. The grey block at the bottom is a redaction over a delivery slip that showed a home address.</p>
+          <p class="fname">fpga-03-tang-primer-25k-dock-wired-to-breadboard.jpg</p>
+        </figcaption>
+      </figure>
+      </div>
+    </section>
+    <section id="motor">
+      <h2>Motors &amp; motor controllers</h2>
+      <p class="sec-note">The power stages, from a three-phase BLDC driver down to a DIP H-bridge, plus the shaft-angle encoder that closes the loop. <em>(12 photos)</em></p>
+      <div class="grid">
+      <figure>
+        <img src="images/motor-01-drv8301-bldc-power-stage-top.jpg" alt="DRV8301 three-phase BLDC power stage" loading="lazy">
+        <figcaption>
+          <h3>DRV8301 three-phase BLDC power stage</h3>
+          <p>A three-phase brushless motor driver board: six TO-263 power MOSFETs in three half-bridges, three R005 (5&nbsp;m&ohm;) current-sense shunts, two 470&nbsp;uF / 63&nbsp;V bulk capacitors, a buck inductor for the on-board step-down, and the DRV8301 gate driver. Phase outputs OUTA / OUTB / OUTC sit on the left edge next to VIN and GND. This is a far bigger stage than the little H-bridges elsewhere in this set &mdash; it is built for a real BLDC/gimbal motor, not a toy DC motor.</p>
+          <p class="fname">motor-01-drv8301-bldc-power-stage-top.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/motor-02-drv8301-bldc-power-stage-mosfets.jpg" alt="DRV8301 board - component side, held for scale" loading="lazy">
+        <figcaption>
+          <h3>DRV8301 board &mdash; component side, held for scale</h3>
+          <p>Same board, in hand. You can see the six MOSFETs across the top, the shunt resistors underneath each half-bridge, the gate-driver IC in the middle, and the 40-pin control header along the bottom edge that the logic side (FPGA or MCU) connects to.</p>
+          <p class="fname">motor-02-drv8301-bldc-power-stage-mosfets.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/motor-03-drv8301-drv8302-pinout-table.jpg" alt="DRV8301 / DRV8302 header pinout - readable" loading="lazy">
+        <figcaption>
+          <h3>DRV8301 / DRV8302 header pinout &mdash; readable</h3>
+          <p>The board is dual-populated, so the back carries two pinout tables and you read the column matching whichever gate driver is fitted. The signals that matter for driving it: <code>INH-A/B/C</code> and <code>INL-A/B/C</code> (the six PWM inputs &mdash; high and low side per phase), <code>EN-GATE</code> (enable), <code>nFAULT</code> and <code>PWRGD</code> (status back to you), <code>nOCTW</code> (over-current / thermal warning), <code>SO-1</code> / <code>SO-2</code> and <code>IOUTA/B/C</code> (current sense out), <code>DC-CAL</code>, and on the DRV8301 an SPI port (<code>SDI</code> / <code>SDO</code> / <code>SCLK</code> / <code>nSCS</code>) for configuration. The DRV8302 swaps SPI for hardware pins <code>M_PWM</code>, <code>M_OC</code>, <code>OC_ADJ</code> and <code>GAIN</code>.</p>
+          <p class="fname">motor-03-drv8301-drv8302-pinout-table.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/motor-04-drv8301-pinout-silkscreen-over-header.jpg" alt="Pinout table next to the header it labels" loading="lazy">
+        <figcaption>
+          <h3>Pinout table next to the header it labels</h3>
+          <p>The same table shot against the header itself, so you can count along and map table row to physical pin.</p>
+          <p class="fname">motor-04-drv8301-pinout-silkscreen-over-header.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/motor-05-drv8301-board-underside-full.jpg" alt="DRV8301 board - whole underside" loading="lazy">
+        <figcaption>
+          <h3>DRV8301 board &mdash; whole underside</h3>
+          <p>Context shot of the back of the driver board: mounting holes, the thermal via fields under each MOSFET, and the pinout tables down at the header end.</p>
+          <p class="fname">motor-05-drv8301-board-underside-full.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/motor-06-l293d-quad-half-h-bridge-dip16.jpg" alt="L293D quad half-H driver (DIP-16)" loading="lazy">
+        <figcaption>
+          <h3>L293D quad half-H driver (DIP-16)</h3>
+          <p>The classic beginner's motor driver. Four half-bridges, usable as two full H-bridges &mdash; so one L293D runs two DC motors bidirectionally, or one bipolar stepper. About 600&nbsp;mA per channel with built-in flyback diodes (that is what the 'D' means). Separate logic and motor supply pins, and the two enable pins are where a PWM duty-cycle from the FPGA goes in. Slow and lossy by modern standards, but it takes 3.3&nbsp;V logic and is hard to destroy.</p>
+          <p class="fname">motor-06-l293d-quad-half-h-bridge-dip16.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/motor-07-l293d-with-sn74hc595-shift-register.jpg" alt="L293D alongside an SN74HC595" loading="lazy">
+        <figcaption>
+          <h3>L293D alongside an SN74HC595</h3>
+          <p>The pair as they are usually used together: the '595 shift register turns three FPGA pins into eight outputs, and those outputs feed the L293D's direction inputs. Handy when you are short of I/O, though note the PWM enable lines should still come straight from the FPGA &mdash; you do not want to shift-register a switching waveform.</p>
+          <p class="fname">motor-07-l293d-with-sn74hc595-shift-register.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/motor-08-uln2003-stepper-driver-board.jpg" alt="ULN2003 stepper driver board" loading="lazy">
+        <figcaption>
+          <h3>ULN2003 stepper driver board</h3>
+          <p>The board that ships with a 28BYJ-48 unipolar stepper. The ULN2003 is seven Darlington sinks &mdash; not an H-bridge, it can only pull each coil tap to ground, which is all a unipolar stepper needs. Inputs <code>IN1</code>&ndash;<code>IN4</code> on the left, the four A/B/C/D LEDs mirror the coil states (very useful when you are debugging a step sequence), the white 5-pin JST takes the motor, and the screw terminal takes 5&ndash;12&nbsp;V.</p>
+          <p class="fname">motor-08-uln2003-stepper-driver-board.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/motor-09-as5600-magnetic-encoder-on-motor.jpg" alt="AS5600 magnetic rotary encoder, mounted on a motor" loading="lazy">
+        <figcaption>
+          <h3>AS5600 magnetic rotary encoder, mounted on a motor</h3>
+          <p>A magnetic angle sensor board bolted to the back of a motor. The chip reads a diametrically-magnetised magnet on the shaft and reports absolute shaft angle over I2C &mdash; this is the feedback half of closed-loop control, which is what turns 'spin the motor' into 'hold this position'. Two JST ports so it can be daisy-chained, and the pinout is silkscreened between them.</p>
+          <p class="fname">motor-09-as5600-magnetic-encoder-on-motor.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/motor-10-as5600-encoder-angled-view.jpg" alt="Encoder board - angled, showing the motor body" loading="lazy">
+        <figcaption>
+          <h3>Encoder board &mdash; angled, showing the motor body</h3>
+          <p>Same assembly tilted, so you can see the encoder PCB standing off the motor bell on four brass pillars and the cable leaving toward the driver.</p>
+          <p class="fname">motor-10-as5600-encoder-angled-view.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/motor-11-as5600-encoder-pin-labels.jpg" alt="Encoder pinout: OUT / PGO / GND / VCC and VCC / GND / SCL / SDA" loading="lazy">
+        <figcaption>
+          <h3>Encoder pinout: OUT / PGO / GND / VCC and VCC / GND / SCL / SDA</h3>
+          <p>Straight-on shot of the silkscreen. Left column <code>OUT</code>, <code>PGO</code>, <code>GND</code>, <code>VCC</code>; right column <code>VCC</code>, <code>GND</code>, <code>SCL</code>, <code>SDA</code>. <code>OUT</code> is the analog/PWM angle output, <code>PGO</code> is the programming pin used to burn the zero position, and SCL/SDA are the normal I2C interface.</p>
+          <p class="fname">motor-11-as5600-encoder-pin-labels.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/motor-12-as5600-encoder-closeup-in-hand.jpg" alt="Encoder board in hand" loading="lazy">
+        <figcaption>
+          <h3>Encoder board in hand</h3>
+          <p>Closest view of the encoder module, with the JST cable colours visible (red / black / yellow / white) for tracing back to the pin labels.</p>
+          <p class="fname">motor-12-as5600-encoder-closeup-in-hand.jpg</p>
+        </figcaption>
+      </figure>
+      </div>
+    </section>
+    <section id="servo">
+      <h2>Servos &amp; the PWM bench rig</h2>
+      <p class="sec-note">Hobby servo and the breadboard setup used to drive it from the dock. <em>(5 photos)</em></p>
+      <div class="grid">
+      <figure>
+        <img src="images/servo-01-standard-hobby-servo-closeup.jpg" alt="Parallax Feedback 360&amp;deg; servo" loading="lazy">
+        <figcaption>
+          <h3>Parallax Feedback 360&deg; servo</h3>
+          <p>The case label reads <strong>Feedback 360 / Parallax Inc.</strong>, which makes this a good deal more interesting than a plain hobby servo. It is a <em>continuous-rotation</em> servo, so the 1.0&ndash;2.0&nbsp;ms control pulse sets <strong>speed and direction</strong>, not angle &mdash; and it adds a fourth wire carrying a feedback signal whose duty cycle reports <strong>absolute shaft position over the full 360&deg;</strong>. That means you can close a position loop entirely in the FPGA with no separate encoder: one counter generates the command pulse, a second measures the feedback pulse, and the difference drives the correction.</p>
+          <p class="fname">servo-01-standard-hobby-servo-closeup.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/servo-02-servo-driven-from-breadboard-rig.jpg" alt="Servo wired to the breadboard rig" loading="lazy">
+        <figcaption>
+          <h3>Servo wired to the breadboard rig</h3>
+          <p>The clearest view of the servo's case label &mdash; <code>Feedback 360</code> over <code>Parallax Inc.</code> Its lead is broken out to jumpers at the breadboard. Note the servo is powered from the breadboard rails rather than from an FPGA pin: a servo's stall current will brown out a dev board instantly, so only the signal and feedback wires should ever touch the FPGA.</p>
+          <p class="fname">servo-02-servo-driven-from-breadboard-rig.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/servo-03-servo-test-rig-with-tang-dock.jpg" alt="Whole servo test setup" loading="lazy">
+        <figcaption>
+          <h3>Whole servo test setup</h3>
+          <p>The full loop in one frame: Tang Primer 25K dock bottom-right, jumpers to the breadboard, breadboard circuit in the middle, servo in hand at the left. The grey block bottom-right is a redaction &mdash; a delivery slip with a home address was lying under the dock.</p>
+          <p class="fname">servo-03-servo-test-rig-with-tang-dock.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/servo-04-breadboard-driver-circuit-detail.jpg" alt="Breadboard driver circuit - detail" loading="lazy">
+        <figcaption>
+          <h3>Breadboard driver circuit &mdash; detail</h3>
+          <p>The discrete stage between FPGA pin and load: an electrolytic across the rails for decoupling, a transistor, a series base resistor, and a flyback diode. This is the minimum honest interface between a 3.3&nbsp;V logic pin and an inductive load.</p>
+          <p class="fname">servo-04-breadboard-driver-circuit-detail.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/servo-05-breadboard-driver-circuit-overhead.jpg" alt="Breadboard circuit from above" loading="lazy">
+        <figcaption>
+          <h3>Breadboard circuit from above</h3>
+          <p>Overhead view of the same breadboard, showing the jumper routing between the power rails, the transistor stage and the header going to the dock.</p>
+          <p class="fname">servo-05-breadboard-driver-circuit-overhead.jpg</p>
+        </figcaption>
+      </figure>
+      </div>
+    </section>
+    <section id="interface">
+      <h2>Logic glue &mdash; level shifting, expansion, ADC</h2>
+      <p class="sec-note">The parts that let a 3.3&nbsp;V FPGA with no analog input talk to the rest of the bench. <em>(11 photos)</em></p>
+      <div class="grid">
+      <figure>
+        <img src="images/interface-01-txs0108e-8ch-level-shifter.jpg" alt="TXS0108E 8-channel bidirectional level shifter" loading="lazy">
+        <figcaption>
+          <h3>TXS0108E 8-channel bidirectional level shifter</h3>
+          <p>The workhorse for connecting a 3.3&nbsp;V FPGA to 5&nbsp;V parts. <code>VA</code> side to 3.3&nbsp;V with <code>A1</code>&ndash;<code>A8</code>, <code>VB</code> side to 5&nbsp;V with <code>B1</code>&ndash;<code>B8</code>, and <code>OE</code> to enable. Auto-direction sensing, so it works for bidirectional buses like I2C &mdash; but it is weakly driven and does not like fast push-pull signals, so use it for slow control lines, not for a clock or a PWM edge you care about.</p>
+          <p class="fname">interface-01-txs0108e-8ch-level-shifter.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/interface-02-txs0108e-level-shifter-in-hand.jpg" alt="Level shifter in hand, for scale" loading="lazy">
+        <figcaption>
+          <h3>Level shifter in hand, for scale</h3>
+          <p>The HW-221 breakout is about the size of a thumbnail. Pin labels are printed on both long edges.</p>
+          <p class="fname">interface-02-txs0108e-level-shifter-in-hand.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/interface-03-txs0108e-level-shifter-underside.jpg" alt="Level shifter - blank underside" loading="lazy">
+        <figcaption>
+          <h3>Level shifter &mdash; blank underside</h3>
+          <p>Nothing on the back but the two mounting holes; included so the board can be identified from either side in a parts bin.</p>
+          <p class="fname">interface-03-txs0108e-level-shifter-underside.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/interface-04-bss138-4ch-logic-level-converter.jpg" alt="4-channel MOSFET level converter (BSS138 type)" loading="lazy">
+        <figcaption>
+          <h3>4-channel MOSFET level converter (BSS138 type)</h3>
+          <p>The other level-shifting option here: four discrete BSS138 MOSFETs with pull-ups, <code>HV1</code>&ndash;<code>HV4</code> on one side and <code>LV1</code>&ndash;<code>LV4</code> on the other. Open-drain by construction, so it is genuinely good for I2C and poor for anything fast.</p>
+          <p class="fname">interface-04-bss138-4ch-logic-level-converter.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/interface-05-sn74ahct125-quad-buffer.jpg" alt="SN74AHCT125N quad tri-state buffer" loading="lazy">
+        <figcaption>
+          <h3>SN74AHCT125N quad tri-state buffer</h3>
+          <p>Four independently-enabled buffers. The useful trick: AHCT inputs are TTL-threshold, so a 3.3&nbsp;V FPGA output reliably registers as a logic high while the chip runs from 5&nbsp;V and drives a clean 5&nbsp;V output. That makes it the right part &mdash; not the TXS0108E &mdash; for pushing a fast one-way signal like WS2812 data or a clock up to 5&nbsp;V.</p>
+          <p class="fname">interface-05-sn74ahct125-quad-buffer.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/interface-06-sn74hc595-shift-register.jpg" alt="SN74HC595N 8-bit serial-in / parallel-out shift register" loading="lazy">
+        <figcaption>
+          <h3>SN74HC595N 8-bit serial-in / parallel-out shift register</h3>
+          <p>Three pins in, eight latched outputs out. Trivial to drive from an FPGA (shift on one clock, then pulse the latch), and cascadable, which is why it shows up wherever there are more LEDs or direction lines than I/O.</p>
+          <p class="fname">interface-06-sn74hc595-shift-register.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/interface-07-mcp3208-12bit-spi-adc.jpg" alt="MCP3208 - 8-channel 12-bit SPI ADC" loading="lazy">
+        <figcaption>
+          <h3>MCP3208 &mdash; 8-channel 12-bit SPI ADC</h3>
+          <p>The FPGA has no analog input at all, so this is how it reads a potentiometer, a current-sense voltage, or the analog output of the encoder. Eight single-ended channels (or four differential), 12-bit, ~100&nbsp;ksps, plain SPI &mdash; a straightforward state machine to write in Verilog. DIP-16 so it goes straight into a breadboard.</p>
+          <p class="fname">interface-07-mcp3208-12bit-spi-adc.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/interface-08-mcp3208-adc-in-hand.jpg" alt="MCP3208 in hand" loading="lazy">
+        <figcaption>
+          <h3>MCP3208 in hand</h3>
+          <p>Scale reference, and the <code>MCP3208-CI/P</code> / date-code marking clearly legible.</p>
+          <p class="fname">interface-08-mcp3208-adc-in-hand.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/interface-09-mcp3208-adc-on-antistatic-bag.jpg" alt="MCP3208 on its antistatic bag" loading="lazy">
+        <figcaption>
+          <h3>MCP3208 on its antistatic bag</h3>
+          <p>Same part as stored. Included because this is what it looks like in the bin rather than on white paper.</p>
+          <p class="fname">interface-09-mcp3208-adc-on-antistatic-bag.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/interface-10-mcp3208-adc-alt-angle.jpg" alt="MCP3208 - second angle" loading="lazy">
+        <figcaption>
+          <h3>MCP3208 &mdash; second angle</h3>
+          <p>Duplicate shot from the same session, kept for the sharper view of the package marking.</p>
+          <p class="fname">interface-10-mcp3208-adc-alt-angle.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/interface-11-mcp3208-adc-second-unit.jpg" alt="MCP3208 - second unit" loading="lazy">
+        <figcaption>
+          <h3>MCP3208 &mdash; second unit</h3>
+          <p>There is more than one of these in the kit; this is the second, shot during the paper-background inventory pass.</p>
+          <p class="fname">interface-11-mcp3208-adc-second-unit.jpg</p>
+        </figcaption>
+      </figure>
+      </div>
+    </section>
+    <section id="sensor">
+      <h2>Sensors &amp; modules</h2>
+      <p class="sec-note">Feedback and I/O: IMU, time-of-flight imager, rangefinder, environmental sensors and displays. <em>(14 photos)</em></p>
+      <div class="grid">
+      <figure>
+        <img src="images/sensor-01-mpu9250-9dof-imu.jpg" alt="MPU-9250 / 6500 / 9255 9-DOF IMU breakout" loading="lazy">
+        <figcaption>
+          <h3>MPU-9250 / 6500 / 9255 9-DOF IMU breakout</h3>
+          <p>Three-axis gyro, accelerometer and magnetometer. Speaks both I2C (<code>SCL</code> / <code>SDA</code>) and SPI (<code>NCS</code>, plus SDA/SCL doubling as MOSI/SCK), with <code>AD0</code> selecting the I2C address, <code>INT</code> for data-ready, and <code>EDA</code> / <code>ECL</code> as an auxiliary master bus. The board silkscreens the X/Y/Z axis convention, which matters as soon as you fuse this with motor position.</p>
+          <p class="fname">sensor-01-mpu9250-9dof-imu.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-02-mpu9250-imu-in-hand.jpg" alt="IMU breakout in hand" loading="lazy">
+        <figcaption>
+          <h3>IMU breakout in hand</h3>
+          <p>Scale shot; the QFN sensor and the axis arrows are visible.</p>
+          <p class="fname">sensor-02-mpu9250-imu-in-hand.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-03-mpu9250-imu-inventory-shot.jpg" alt="IMU breakout - inventory shot" loading="lazy">
+        <figcaption>
+          <h3>IMU breakout &mdash; inventory shot</h3>
+          <p>The same board photographed flat during the paper-background pass, with the full pin column legible top to bottom.</p>
+          <p class="fname">sensor-03-mpu9250-imu-inventory-shot.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-04-hc-sr04-ultrasonic-rangefinder.jpg" alt="HC-SR04 ultrasonic rangefinder" loading="lazy">
+        <figcaption>
+          <h3>HC-SR04 ultrasonic rangefinder</h3>
+          <p>Transmit and receive transducers with <code>Vcc</code> / <code>Trig</code> / <code>Echo</code> / <code>Gnd</code>. You pulse Trig for 10&nbsp;us and time how long Echo stays high &mdash; which is pure counter work, so it is one of the most natural first 'real' FPGA peripherals. Note it is a 5&nbsp;V part: the Echo line needs to come back down through a level shifter or a divider.</p>
+          <p class="fname">sensor-04-hc-sr04-ultrasonic-rangefinder.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-05-dht11-temperature-humidity-sensor.jpg" alt="DHT11 temperature / humidity sensor" loading="lazy">
+        <figcaption>
+          <h3>DHT11 temperature / humidity sensor</h3>
+          <p>Single-wire sensor on a small carrier with its pull-up already fitted. The protocol is a bit-banged timing sequence, so like the HC-SR04 it is a timer exercise &mdash; but a fussier one, since it is bidirectional on one pin.</p>
+          <p class="fname">sensor-05-dht11-temperature-humidity-sensor.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-06-ds1307-real-time-clock-module.jpg" alt="DS1307 real-time clock module" loading="lazy">
+        <figcaption>
+          <h3>DS1307 real-time clock module</h3>
+          <p>Battery-backed I2C clock/calendar with a coin cell and a square-wave output (<code>SQW</code>). The SQW pin is the interesting one for FPGA work: a stable 1&nbsp;Hz reference to check a home-made clock divider against.</p>
+          <p class="fname">sensor-06-ds1307-real-time-clock-module.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-07-max7219-dot-matrix-driver-module.jpg" alt="MAX7219 8x8 dot-matrix module" loading="lazy">
+        <figcaption>
+          <h3>MAX7219 8x8 dot-matrix module</h3>
+          <p>SPI-ish display driver: <code>DIN</code> / <code>CS</code> / <code>CLK</code> in on one edge, <code>DOUT</code> out the other so modules chain. Doing the multiplexing in the FPGA instead is a good exercise, but this board is the quick way to get a visible output.</p>
+          <p class="fname">sensor-07-max7219-dot-matrix-driver-module.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-08-ldr-photoresistor.jpg" alt="LDR (photoresistor)" loading="lazy">
+        <figcaption>
+          <h3>LDR (photoresistor)</h3>
+          <p>Light-dependent resistor. Analog only, so it pairs with the MCP3208 &mdash; or with a 555 as a light-to-frequency trick if you want to keep everything digital.</p>
+          <p class="fname">sensor-08-ldr-photoresistor.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-09-ntc-thermistor.jpg" alt="NTC thermistor" loading="lazy">
+        <figcaption>
+          <h3>NTC thermistor</h3>
+          <p>Glass-bead negative-temperature-coefficient thermistor. Again analog: divider plus ADC. Worth keeping near the motor driver &mdash; it is the cheapest way to notice a power stage getting hot.</p>
+          <p class="fname">sensor-09-ntc-thermistor.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-10-sw520d-tilt-switch-and-s8050-transistor.jpg" alt="SW-520D tilt switch and S8050 NPN transistor" loading="lazy">
+        <figcaption>
+          <h3>SW-520D tilt switch and S8050 NPN transistor</h3>
+          <p>The SW-520D is a ball tilt switch &mdash; a rolling ball bridges two contacts depending on orientation. It bounces badly, so it is a good target for the debounce logic already written for the dock buttons. The S8050 next to it is a small general-purpose NPN (~500&nbsp;mA), fine for switching an LED or a relay coil from a logic pin.</p>
+          <p class="fname">sensor-10-sw520d-tilt-switch-and-s8050-transistor.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-11-sw18020p-vibration-switch.jpg" alt="SW-18020P vibration switch" loading="lazy">
+        <figcaption>
+          <h3>SW-18020P vibration switch</h3>
+          <p>Spring-type vibration/shock switch: the internal spring touches the centre pin when knocked. Momentary and extremely noisy &mdash; treat it as an event source through a one-shot, not as a level.</p>
+          <p class="fname">sensor-11-sw18020p-vibration-switch.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-12-tilt-switch-transistor-and-buzzer-group.jpg" alt="Tilt switch, transistor and buzzer together" loading="lazy">
+        <figcaption>
+          <h3>Tilt switch, transistor and buzzer together</h3>
+          <p>Group shot of the SW-520D, the S8050 and the magnetic buzzer &mdash; the three parts of a 'tip it and it beeps' circuit.</p>
+          <p class="fname">sensor-12-tilt-switch-transistor-and-buzzer-group.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-13-sparkfun-vl53l5cx-tof-imager-qwiic-pair.jpg" alt="SparkFun VL53L5CX ToF imager on a Qwiic link" loading="lazy">
+        <figcaption>
+          <h3>SparkFun VL53L5CX ToF imager on a Qwiic link</h3>
+          <p>The most capable sensor in the pile: a VL53L5CX time-of-flight <em>imager</em> &mdash; not a single distance reading but an 8x8 grid of them, up to about 4&nbsp;m. It is taped to card and joined by a Qwiic (4-pin JST-SH I2C) cable to the small SparkFun breakout on the left. Being I2C at 3.3&nbsp;V it can talk to the FPGA directly, though the register interface is heavy enough that it is usually driven from a soft CPU rather than raw Verilog.</p>
+          <p class="fname">sensor-13-sparkfun-vl53l5cx-tof-imager-qwiic-pair.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/sensor-14-parts-inventory-overview.jpg" alt="Whole-kit overview" loading="lazy">
+        <figcaption>
+          <h3>Whole-kit overview</h3>
+          <p>Everything laid out at once: the Tang dock centre, MAX7219 matrix and 7-segment display, 1602 LCD, HC-SR04, DHT11, DS1307, MPU-9250, the ULN2003 stepper board in its bag, a water-level sensor, the MCP3208, and the taped VL53L5CX/Qwiic pair on the cardboard strip.</p>
+          <p class="fname">sensor-14-parts-inventory-overview.jpg</p>
+        </figcaption>
+      </figure>
+      </div>
+    </section>
+    <section id="discrete">
+      <h2>Discrete semiconductors &amp; switches</h2>
+      <p class="sec-note">Transistors, diodes, small ICs, buttons and buzzers &mdash; the parts that sit between a logic pin and something that moves. <em>(18 photos)</em></p>
+      <div class="grid">
+      <figure>
+        <img src="images/discrete-01-2n2222a-npn-transistor.jpg" alt="2N2222A NPN transistor (TO-92)" loading="lazy">
+        <figcaption>
+          <h3>2N2222A NPN transistor (TO-92)</h3>
+          <p>General-purpose NPN, ~800&nbsp;mA, ~40&nbsp;V. The default answer to 'this FPGA pin cannot source enough current' &mdash; base resistor from the pin, load in the collector, flyback diode if the load is a coil.</p>
+          <p class="fname">discrete-01-2n2222a-npn-transistor.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-02-2n2222a-npn-on-paper.jpg" alt="2N2222A - inventory shot" loading="lazy">
+        <figcaption>
+          <h3>2N2222A &mdash; inventory shot</h3>
+          <p>Same part on the paper background, marking <code>2N2222A</code> legible.</p>
+          <p class="fname">discrete-02-2n2222a-npn-on-paper.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-03-2n2222a-npn-closeup.jpg" alt="2N2222A - closer" loading="lazy">
+        <figcaption>
+          <h3>2N2222A &mdash; closer</h3>
+          <p>Tighter shot showing the flat face and lead order.</p>
+          <p class="fname">discrete-03-2n2222a-npn-closeup.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-04-mps2222a-npn-transistor-strip.jpg" alt="MPS2222A NPN transistors, taped strip" loading="lazy">
+        <figcaption>
+          <h3>MPS2222A NPN transistors, taped strip</h3>
+          <p>The same 2222 in Motorola/ON's MPS package, still on the tape bandolier &mdash; a strip of five. Interchangeable with the 2N2222A for this kind of switching, but check the pinout: TO-92 lead order is not universal.</p>
+          <p class="fname">discrete-04-mps2222a-npn-transistor-strip.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-05-mps2222a-npn-markings.jpg" alt="MPS2222A - package markings" loading="lazy">
+        <figcaption>
+          <h3>MPS2222A &mdash; package markings</h3>
+          <p>Close enough to read <code>MPS2222A</code> and the date code.</p>
+          <p class="fname">discrete-05-mps2222a-npn-markings.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-06-mps2907a-pnp-transistor-strip.jpg" alt="MPS2907A PNP transistors, taped strip" loading="lazy">
+        <figcaption>
+          <h3>MPS2907A PNP transistors, taped strip</h3>
+          <p>The PNP complement to the 2222. You need these for high-side switching &mdash; and a pair of 2222/2907 is the basis of a discrete H-bridge if you would rather build one than use the L293D.</p>
+          <p class="fname">discrete-06-mps2907a-pnp-transistor-strip.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-07-1n4148-signal-diodes.jpg" alt="1N4148 small-signal diodes" loading="lazy">
+        <figcaption>
+          <h3>1N4148 small-signal diodes</h3>
+          <p>Glass DO-35 switching diodes: fast, ~200&nbsp;mA, 100&nbsp;V. For logic steering, clamping and small flyback duty. Not enough for a motor coil &mdash; that is what the 1N4007s are for.</p>
+          <p class="fname">discrete-07-1n4148-signal-diodes.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-08-1n4007-rectifier-diodes.jpg" alt="1N4007 rectifier diodes" loading="lazy">
+        <figcaption>
+          <h3>1N4007 rectifier diodes</h3>
+          <p>1&nbsp;A / 1000&nbsp;V DO-41 rectifiers. This is the flyback diode you put across a relay or motor winding so the inductive kick does not punch back into the switching transistor. Slow, but the voltage headroom is generous.</p>
+          <p class="fname">discrete-08-1n4007-rectifier-diodes.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-09-tlc555-timer-ic.jpg" alt="TLC555CP timer" loading="lazy">
+        <figcaption>
+          <h3>TLC555CP timer</h3>
+          <p>CMOS version of the 555 &mdash; lower current, works happily at 3.3&nbsp;V, unlike the bipolar NE555. Useful as an independent oscillator to check FPGA timing against, or as a light-to-frequency front end with the LDR.</p>
+          <p class="fname">discrete-09-tlc555-timer-ic.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-10-lm358-dual-op-amp.jpg" alt="LM358P dual op-amp" loading="lazy">
+        <figcaption>
+          <h3>LM358P dual op-amp</h3>
+          <p>Two single-supply op-amps. The motor-relevant use is amplifying the millivolt drop across a current-sense shunt up to something the MCP3208 can digitise &mdash; the front end of current control.</p>
+          <p class="fname">discrete-10-lm358-dual-op-amp.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-11-5mm-leds-red-green-white.jpg" alt="5&amp;nbsp;mm LEDs" loading="lazy">
+        <figcaption>
+          <h3>5&nbsp;mm LEDs</h3>
+          <p>Red, green and diffused white 5&nbsp;mm LEDs. In the lessons here the LEDs mirror the motor PWM, so brightness stands in for motor speed and the design can be tested with no motor wired at all.</p>
+          <p class="fname">discrete-11-5mm-leds-red-green-white.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-12-tactile-pushbutton-6mm.jpg" alt="6&amp;nbsp;mm tactile pushbutton" loading="lazy">
+        <figcaption>
+          <h3>6&nbsp;mm tactile pushbutton</h3>
+          <p>Standard four-leg tact switch (the legs are paired, so it is really a two-terminal part). Bounces for milliseconds on every press, which is exactly why the motor design has a synchroniser, a debouncer and an edge detector in front of it.</p>
+          <p class="fname">discrete-12-tactile-pushbutton-6mm.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-13-spdt-slide-switch.jpg" alt="SPDT slide switch" loading="lazy">
+        <figcaption>
+          <h3>SPDT slide switch</h3>
+          <p>Three-pin slide switch for a static mode or direction selection &mdash; a level rather than an event, so no debounce logic needed beyond a synchroniser.</p>
+          <p class="fname">discrete-13-spdt-slide-switch.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-14-trimmer-potentiometer-10k.jpg" alt="Trimmer potentiometer, 10&amp;nbsp;k&amp;ohm; (marked 103)" loading="lazy">
+        <figcaption>
+          <h3>Trimmer potentiometer, 10&nbsp;k&ohm; (marked 103)</h3>
+          <p>Multi-turn-style trimpot. Marked <code>103</code> = 10 &times; 10^3 = 10&nbsp;k&ohm;. Wire the wiper to an MCP3208 channel and you have a manual speed/position input for the motor lessons.</p>
+          <p class="fname">discrete-14-trimmer-potentiometer-10k.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-15-trimmer-potentiometer-1k.jpg" alt="Trimmer potentiometer, 1&amp;nbsp;k&amp;ohm; (marked 102)" loading="lazy">
+        <figcaption>
+          <h3>Trimmer potentiometer, 1&nbsp;k&ohm; (marked 102)</h3>
+          <p>Same body style, <code>102</code> = 1&nbsp;k&ohm;.</p>
+          <p class="fname">discrete-15-trimmer-potentiometer-1k.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-16-magnetic-buzzer.jpg" alt="Magnetic buzzer" loading="lazy">
+        <figcaption>
+          <h3>Magnetic buzzer</h3>
+          <p>Sealed buzzer with the 'remove seal after washing' sticker still on. Drive it with a square wave from the FPGA &mdash; through a transistor, since it draws more than a pin should supply.</p>
+          <p class="fname">discrete-16-magnetic-buzzer.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-17-tdk-piezo-buzzer-element.jpg" alt="TDK piezo buzzer element" loading="lazy">
+        <figcaption>
+          <h3>TDK piezo buzzer element</h3>
+          <p>The passive counterpart: a bare piezo element with no drive circuit inside, so it makes no sound unless you feed it a tone. Higher impedance, so it can often be driven straight from a pin.</p>
+          <p class="fname">discrete-17-tdk-piezo-buzzer-element.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/discrete-18-ceramic-disc-capacitor.jpg" alt="Ceramic disc capacitor" loading="lazy">
+        <figcaption>
+          <h3>Ceramic disc capacitor</h3>
+          <p>Single leaded ceramic. The everyday job for these is a decoupling cap right at each IC's supply pin &mdash; including the level shifters and the ADC, which misbehave without one.</p>
+          <p class="fname">discrete-18-ceramic-disc-capacitor.jpg</p>
+        </figcaption>
+      </figure>
+      </div>
+    </section>
+    <section id="passive">
+      <h2>Passives</h2>
+      <p class="sec-note">Capacitors and resistors. Hand-labelled reels have confirmed values; the rest need a meter. <em>(15 photos)</em></p>
+      <div class="grid">
+      <figure>
+        <img src="images/passive-01-electrolytic-capacitors-100uf-16v.jpg" alt="100&amp;nbsp;uF / 16&amp;nbsp;V electrolytic capacitors" loading="lazy">
+        <figcaption>
+          <h3>100&nbsp;uF / 16&nbsp;V electrolytic capacitors</h3>
+          <p>Bulk capacitance for the breadboard rails. Anything that switches a motor needs this close to the driver, or the supply sags on every PWM edge and the logic browns out.</p>
+          <p class="fname">passive-01-electrolytic-capacitors-100uf-16v.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-02-electrolytic-capacitors-10uf-50v.jpg" alt="10&amp;nbsp;uF / 50&amp;nbsp;V electrolytics, with ceramics" loading="lazy">
+        <figcaption>
+          <h3>10&nbsp;uF / 50&nbsp;V electrolytics, with ceramics</h3>
+          <p>Smaller electrolytics on the tape alongside yellow <code>103</code> (10&nbsp;nF) ceramics.</p>
+          <p class="fname">passive-02-electrolytic-capacitors-10uf-50v.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-03-capacitor-assortment-closeup.jpg" alt="Capacitor assortment - closeup" loading="lazy">
+        <figcaption>
+          <h3>Capacitor assortment &mdash; closeup</h3>
+          <p>Mixed strip of 10&nbsp;uF electrolytics and ceramic caps, showing the date codes and the &minus;40&hellip;+105&nbsp;&deg;C rating.</p>
+          <p class="fname">passive-03-capacitor-assortment-closeup.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-04-carbon-film-resistors-bandolier-a.jpg" alt="Carbon-film resistors, bandolier A" loading="lazy">
+        <figcaption>
+          <h3>Carbon-film resistors, bandolier A</h3>
+          <p>Beige-bodied 4-band carbon film, ten on tape, no written value &mdash; read the bands off the photo or measure them before use. Kept as one of four unlabelled reels.</p>
+          <p class="fname">passive-04-carbon-film-resistors-bandolier-a.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-05-carbon-film-resistors-bandolier-b.jpg" alt="Carbon-film resistors, bandolier B" loading="lazy">
+        <figcaption>
+          <h3>Carbon-film resistors, bandolier B</h3>
+          <p>Second unlabelled carbon-film reel, visibly a different colour code from bandolier A.</p>
+          <p class="fname">passive-05-carbon-film-resistors-bandolier-b.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-06-carbon-film-resistors-bandolier-c.jpg" alt="Carbon-film resistors, bandolier C" loading="lazy">
+        <figcaption>
+          <h3>Carbon-film resistors, bandolier C</h3>
+          <p>Third unlabelled reel.</p>
+          <p class="fname">passive-06-carbon-film-resistors-bandolier-c.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-07-carbon-film-resistors-bandolier-d.jpg" alt="Carbon-film resistors, bandolier D" loading="lazy">
+        <figcaption>
+          <h3>Carbon-film resistors, bandolier D</h3>
+          <p>Fourth unlabelled reel.</p>
+          <p class="fname">passive-07-carbon-film-resistors-bandolier-d.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-08-metal-film-resistors-100-ohm.jpg" alt="Metal-film resistors - reads as 100&amp;nbsp;&amp;ohm; 1%" loading="lazy">
+        <figcaption>
+          <h3>Metal-film resistors &mdash; reads as 100&nbsp;&ohm; 1%</h3>
+          <p>Blue-bodied 5-band metal film. Bands read brown-black-black-black-brown, i.e. 100&nbsp;&ohm; at 1% &mdash; the clearest of the unlabelled reels, but worth confirming with a meter.</p>
+          <p class="fname">passive-08-metal-film-resistors-100-ohm.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-09-metal-film-resistors-reel-b.jpg" alt="Metal-film resistors, reel B" loading="lazy">
+        <figcaption>
+          <h3>Metal-film resistors, reel B</h3>
+          <p>Blue 5-band metal film, unlabelled. Bands are visible in the photo but not reliably readable from it &mdash; measure before use.</p>
+          <p class="fname">passive-09-metal-film-resistors-reel-b.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-10-metal-film-resistors-reel-c.jpg" alt="Metal-film resistors, reel C" loading="lazy">
+        <figcaption>
+          <h3>Metal-film resistors, reel C</h3>
+          <p>Another unlabelled 5-band reel with a distinct code from reel B.</p>
+          <p class="fname">passive-10-metal-film-resistors-reel-c.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-11-metal-film-resistors-reel-d.jpg" alt="Metal-film resistors, reel D" loading="lazy">
+        <figcaption>
+          <h3>Metal-film resistors, reel D</h3>
+          <p>Fourth unlabelled metal-film reel.</p>
+          <p class="fname">passive-11-metal-film-resistors-reel-d.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-12-resistors-220-ohm-labelled.jpg" alt="220&amp;nbsp;&amp;ohm; resistors (hand-labelled)" loading="lazy">
+        <figcaption>
+          <h3>220&nbsp;&ohm; resistors (hand-labelled)</h3>
+          <p>A wide strip written up as <code>220</code> on the tape. 220&nbsp;&ohm; is the standard LED series resistor at 3.3&ndash;5&nbsp;V, which is why there are so many.</p>
+          <p class="fname">passive-12-resistors-220-ohm-labelled.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-13-resistors-1m-labelled.jpg" alt="1&amp;nbsp;M&amp;ohm; resistors (hand-labelled)" loading="lazy">
+        <figcaption>
+          <h3>1&nbsp;M&ohm; resistors (hand-labelled)</h3>
+          <p>Tape marked <code>1M</code>. High-value parts for timing networks and high-impedance pull-downs.</p>
+          <p class="fname">passive-13-resistors-1m-labelled.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-14-resistors-5k1-labelled.jpg" alt="5.1&amp;nbsp;k&amp;ohm; resistors (hand-labelled)" loading="lazy">
+        <figcaption>
+          <h3>5.1&nbsp;k&ohm; resistors (hand-labelled)</h3>
+          <p>Tape marked <code>5K1</code>. Note 5.1&nbsp;k is also the USB-C CC pull-down value, which is worth remembering around the dock's USB-C port.</p>
+          <p class="fname">passive-14-resistors-5k1-labelled.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/passive-15-resistors-330-ohm-labelled.jpg" alt="330&amp;nbsp;&amp;ohm; resistors (hand-labelled)" loading="lazy">
+        <figcaption>
+          <h3>330&nbsp;&ohm; resistors (hand-labelled)</h3>
+          <p>Tape marked <code>330</code>. The other common LED series value, and a sensible base resistor for the small NPNs.</p>
+          <p class="fname">passive-15-resistors-330-ohm-labelled.jpg</p>
+        </figcaption>
+      </figure>
+      </div>
+    </section>
+    <section id="power">
+      <h2>Power &amp; test gear</h2>
+      <p class="sec-note">Regulators, supplies, the reference MCU and the two instruments. <em>(8 photos)</em></p>
+      <div class="grid">
+      <figure>
+        <img src="images/power-01-l7805cv-5v-regulator.jpg" alt="L7805CV 5&amp;nbsp;V linear regulator" loading="lazy">
+        <figcaption>
+          <h3>L7805CV 5&nbsp;V linear regulator</h3>
+          <p>TO-220 5&nbsp;V regulator, 1&nbsp;A. Linear, so it burns the difference as heat &mdash; fine for logic, wrong for a motor rail.</p>
+          <p class="fname">power-01-l7805cv-5v-regulator.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/power-02-l7805cv-5v-regulator-to220.jpg" alt="L7805CV - inventory shot" loading="lazy">
+        <figcaption>
+          <h3>L7805CV &mdash; inventory shot</h3>
+          <p>The same regulator flat on paper with the part number legible.</p>
+          <p class="fname">power-02-l7805cv-5v-regulator-to220.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/power-03-ld1117-3v3-regulator.jpg" alt="LD33V 3.3&amp;nbsp;V regulator (LD1117 family)" loading="lazy">
+        <figcaption>
+          <h3>LD33V 3.3&nbsp;V regulator (LD1117 family)</h3>
+          <p>TO-220 low-dropout 3.3&nbsp;V regulator &mdash; the rail everything on the FPGA side runs at. Low dropout matters here: it will hold 3.3&nbsp;V from a 5&nbsp;V input where a 7805-style part would not.</p>
+          <p class="fname">power-03-ld1117-3v3-regulator.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/power-04-elegoo-breadboard-power-supply.jpg" alt="Breadboard power supply module" loading="lazy">
+        <figcaption>
+          <h3>Breadboard power supply module</h3>
+          <p>Straddles the breadboard rails and provides selectable 3.3&nbsp;V or 5&nbsp;V per side from a 6.5&ndash;9&nbsp;V barrel input or USB. This is what keeps motor current off the FPGA board's regulator &mdash; the right habit as soon as a servo or an H-bridge is involved.</p>
+          <p class="fname">power-04-elegoo-breadboard-power-supply.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/power-05-breadboard-power-supply-detail.jpg" alt="Breadboard PSU - jumper detail" loading="lazy">
+        <figcaption>
+          <h3>Breadboard PSU &mdash; jumper detail</h3>
+          <p>Closer view showing the per-rail 3.3&nbsp;V / 5&nbsp;V jumper blocks, the AMS1117 regulators, the power switch and the USB-A output.</p>
+          <p class="fname">power-05-breadboard-power-supply-detail.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/mcu-01-arduino-mega-2560.jpg" alt="Arduino Mega 2560 (Elegoo)" loading="lazy">
+        <figcaption>
+          <h3>Arduino Mega 2560 (Elegoo)</h3>
+          <p>The non-FPGA board in the pile. Useful as a known-good reference controller &mdash; if a sensor or driver works from the Mega but not from the FPGA, the problem is in the Verilog, not the wiring. Note it is a 5&nbsp;V part, so anything shared with the Tang has to cross a level shifter.</p>
+          <p class="fname">mcu-01-arduino-mega-2560.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/tool-01-wanptek-dps3010u-bench-supply.jpg" alt="Wanptek DPS3010U bench power supply" loading="lazy">
+        <figcaption>
+          <h3>Wanptek DPS3010U bench power supply</h3>
+          <p>Adjustable 30&nbsp;V / 10&nbsp;A supply with constant-voltage and constant-current modes, showing 6.00&nbsp;V set. The current limit is the important feature: dial it down before first power-on and a miswired motor driver simply refuses to start instead of destroying itself.</p>
+          <p class="fname">tool-01-wanptek-dps3010u-bench-supply.jpg</p>
+        </figcaption>
+      </figure>
+      <figure>
+        <img src="images/tool-02-klein-mm300-multimeter.jpg" alt="Klein Tools MM300 multimeter" loading="lazy">
+        <figcaption>
+          <h3>Klein Tools MM300 multimeter</h3>
+          <p>Manual-ranging DMM: volts, ohms, up to 10&nbsp;A, continuity and diode test. The tool for settling the resistor bandoliers above and for confirming which dock header hole is really <code>G5</code>.</p>
+          <p class="fname">tool-02-klein-mm300-multimeter.jpg</p>
+        </figcaption>
+      </figure>
+      </div>
+    </section>
+
+  <footer>
+    <p>Built from 84 phone originals, which are kept outside this repo because
+    they carry GPS EXIF. The published copies in <code>photos/images/</code> are
+    cropped, stripped of all metadata, and redacted where a delivery slip was in
+    frame. Regenerate with
+    <code>PHOTO_SRC=&lt;dir&gt; python3 photos/build_gallery.py</code>.</p>
+    <p>Part identifications are read off package markings and board silkscreens
+    in the photos. Resistor values are only stated where the tape is
+    hand-labelled or the bands are unambiguous &mdash; the rest are flagged as
+    needing a meter.</p>
+  </footer>
+</div>
+</body>
+</html>

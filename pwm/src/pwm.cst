@@ -1,0 +1,8 @@
+// Same three pins as the blink lesson.
+IO_LOC "clk"       E2;
+IO_LOC "led_done"  D7;
+IO_LOC "led_ready" E8;
+
+IO_PORT "clk"       PULL_MODE=NONE BANK_VCCIO=3.3;
+IO_PORT "led_done"  PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;
+IO_PORT "led_ready" PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;

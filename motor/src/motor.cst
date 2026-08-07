@@ -1,0 +1,21 @@
+// clk / LEDs / button: same as previous lessons.
+// Motor pins: first two PMOD IOs from Sipeed's reference constraint list.
+// NOTE: before physically wiring the DRV8833, we confirm which header
+// positions G5/F5 are on the dock silkscreen/schematic.
+
+IO_LOC "clk"       E2;
+IO_LOC "key"       H11;   // dock button S1, active-high (S2 would be H10)
+IO_LOC "led_done"  D7;
+IO_LOC "led_ready" E8;
+IO_LOC "motor_in1" G5;
+IO_LOC "motor_in2" F5;
+
+IO_PORT "clk"       PULL_MODE=NONE BANK_VCCIO=3.3;
+// Pull-DOWN is essential: the button connects the pin to 3.3V when
+// pressed, but NOTHING drives it when released — without the pull the
+// pin floats and reads noise.
+IO_PORT "key"       PULL_MODE=DOWN DRIVE=OFF BANK_VCCIO=3.3;
+IO_PORT "led_done"  PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;
+IO_PORT "led_ready" PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;
+IO_PORT "motor_in1" PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;
+IO_PORT "motor_in2" PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;
