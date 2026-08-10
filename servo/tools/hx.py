@@ -11,6 +11,8 @@ The FPGA relays whole packets between this port at 115200 and the servo's
     python3 tools/hx.py stop
     python3 tools/hx.py read 0x21 2
     python3 tools/hx.py write 0x2E 4000 2
+    python3 tools/hx.py setid 2                  # ONE servo connected only
+    python3 tools/hx.py syncmove 1:1000 2:2000 3:3000
 
 No dependency on the vendor SDK -- and deliberately not modelled on it,
 since its half-duplex handling reads its own echo as a valid reply.
@@ -206,6 +208,55 @@ def cmd_setspeed(bus, speed, sid=1):
           f"current={bus.read_word(sid,0x45,2)} mA")
 
 
+def cmd_setid(bus, new_id, old_id=None):
+    """Give one servo a new ID.
+
+    Every HX-30HM ships as ID 1, so a chain of three fresh servos is three
+    devices answering to the same address. Writing an ID with more than one
+    connected renames ALL of them simultaneously and leaves you no way to
+    tell them apart -- so this refuses to run unless exactly one servo is on
+    the bus. Connect them ONE AT A TIME for this step, then daisy-chain.
+    """
+    present = [s for s in range(0, 21) if bus.ping(s)]
+    if len(present) == 0:
+        print("no servo answered. Check power and wiring.")
+        return
+    if len(present) > 1:
+        print(f"REFUSING: {len(present)} servos on the bus {present}.")
+        print("Connect exactly ONE servo when assigning an ID, or they all")
+        print("get renamed together and become indistinguishable.")
+        return
+
+    sid = present[0] if old_id is None else old_id
+    print(f"found exactly one servo at ID {sid} -> assigning ID {new_id}")
+    bus.write(sid, 0x37, [0])                  # unlock NVS
+    bus.write(sid, 0x05, [new_id & 0xFF])      # ID register
+    bus.write(new_id, 0x37, [1])               # re-lock, now at the NEW id
+
+    if bus.ping(new_id):
+        print(f"  ok: responds at ID {new_id}; lock={bus.read_word(new_id,0x37,1)}")
+    else:
+        print(f"  !! no reply at ID {new_id}. Run 'scan' to find it.")
+
+
+def cmd_syncmove(bus, targets, speed=600):
+    """One packet, several servos, simultaneous start.
+
+    targets: [(id, position), ...]. Sending three separate WRITEs would start
+    the servos milliseconds apart; SYNC WRITE lands them on the same tick.
+    """
+    L, n = 6, len(targets)
+    payload = [BROADCAST, (L + 1) * n + 4, 0x83, 0x2A, L]
+    for sid, pos in targets:
+        payload += [sid] + w16(pos) + w16(0) + w16(speed)
+    pkt = bytes([0xFF, 0xFF] + payload + [Bus.checksum(payload)])
+    bus.ser.reset_input_buffer()
+    bus.ser.write(pkt)
+    bus.ser.flush()
+    print("sync write:", pkt.hex(" "))
+    return pkt
+
+
 def cmd_stop(bus, sid=1):
     bus.write(sid, 0x2E, w16(0))
     bus.write(sid, 0x37, [0])
@@ -228,6 +279,11 @@ def main():
     elif a == "spin":  cmd_spin(bus, int(sys.argv[2], 0))
     elif a == "setspeed": cmd_setspeed(bus, int(sys.argv[2], 0))
     elif a == "stop":  cmd_stop(bus)
+    elif a == "setid": cmd_setid(bus, int(sys.argv[2], 0))
+    elif a == "syncmove":
+        # syncmove 1:1000 2:2000 3:3000
+        tg = [tuple(int(x, 0) for x in p.split(":")) for p in sys.argv[2:]]
+        cmd_syncmove(bus, tg)
     elif a == "read":
         addr, n = int(sys.argv[2], 0), int(sys.argv[3], 0)
         print(bus.read(1, addr, n))
