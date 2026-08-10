@@ -11,6 +11,7 @@ control — plus a labelled photo reference for the parts on the bench.
 | `blink/` | Clock divider, the `.cst` / `.sdc` constraint files, first bitstream |
 | `pwm/`   | Counter-and-comparator PWM, duty cycle as a parameter |
 | `motor/` | DC motor speed control: input synchroniser, debouncer, edge detector, 20 kHz PWM |
+| `servo/` | Hiwonder HX-30HM bus servo: 1 Mbaud UART, packet framing and checksums, owning a shared half-duplex wire |
 
 Each lesson has the same shape:
 
@@ -31,12 +32,47 @@ Synthesis and bitstream, using Gowin's Tcl shell:
 gw_sh motor/build.tcl
 ```
 
+Or with the **open toolchain**, which needs no vendor account and builds the
+GW5A-25 directly — yosys, nextpnr-himbaechel, apicula and openFPGALoader all
+ship in [oss-cad-suite](https://github.com/YosysHQ/oss-cad-suite-build/releases):
+
+```sh
+cd servo
+make          # impl/servo.fs
+make flash    # load to SRAM (volatile — gone at power-off)
+make prog     # write to onboard flash (survives power cycling)
+```
+
+Two GW5A-25A quirks the Makefile encodes, both of which abort the build if
+you get them wrong:
+
+- **SSPI must be configured as GPIO**, and nextpnr and `gowin_pack`
+  cross-check each other on it — set it in only one place and the pack step
+  fails with "conflicting settings".
+- The dock's LEDs sit on the **DONE and READY config pins**, so those have to
+  be released to GPIO too (the same thing `build.tcl`'s `set_option` lines do).
+
 Simulation only, no vendor tools needed:
 
 ```sh
 cd motor && iverilog -o motor_tb.vvp tb/motor_tb.v src/motor.v && vvp motor_tb.vvp
 gtkwave motor_tb.vcd
 ```
+
+`servo/` has several source files and two testbenches — one for the wire
+protocol, one for the button sequence end to end:
+
+```sh
+cd servo
+iverilog -o servo_tb.vvp tb/servo_tb.v tb/hx_model.v \
+         src/hx_bus.v src/uart_tx.v src/uart_rx.v && vvp servo_tb.vvp
+iverilog -o top_tb.vvp   tb/top_tb.v   tb/hx_model.v \
+         src/servo.v src/hx_bus.v src/uart_tx.v src/uart_rx.v && vvp top_tb.vvp
+```
+
+`tb/hx_model.v` is a behavioural HX-30HM that validates checksums and
+replies. It is the substitute for a logic analyser: every packet is proven
+against it before a real servo is asked to interpret one.
 
 Build output lands in `<lesson>/impl/` and is gitignored — it is regenerable,
 large, and its logs embed absolute paths.
@@ -70,6 +106,16 @@ slip happened to be in frame.
   continuous-rotation, so the control pulse sets speed rather than angle, and
   it returns absolute shaft position on a feedback wire — enough to close a
   position loop in the FPGA with no separate encoder.
+
+### Before wiring the servo lesson
+
+The HX-30HM runs on **11.1 V from its own supply** and can pull 6 A. It never
+shares a rail with the FPGA — the two share exactly one wire, a ground
+reference. Its SIG line is expected to be 3.3 V logic (Hiwonder's own SDK
+drives it straight from ESP32 and Raspberry Pi pins, neither of which is 5 V
+tolerant), but **measure it before connecting anything to a GW5A pin**: a
+3.3 V bank is not 5 V tolerant, and the series resistors in `servo.cst`'s
+header comment are there to bound the damage if that assumption is wrong.
 
 Note that `motor/src/motor.v` is written against a **DRV8833** H-bridge, which
 is not among the photographed parts. The **L293D** is the closest drop-in; the

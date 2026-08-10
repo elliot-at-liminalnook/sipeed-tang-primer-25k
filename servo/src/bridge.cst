@@ -1,0 +1,21 @@
+// Constraints for the debug bridge.
+//
+// host_rx / host_tx are the dock's FT2232 channel-B UART. Pin locations are
+// taken from Sipeed's own UART/simple_uart example, not guessed.
+// Servo pins are unchanged from servo.cst.
+
+IO_LOC "clk"       E2;
+IO_LOC "host_rx"   B3;
+IO_LOC "host_tx"   C3;
+IO_LOC "servo_tx"  G5;
+IO_LOC "servo_rx"  F5;
+IO_LOC "led_done"  D7;
+IO_LOC "led_ready" E8;
+
+IO_PORT "clk"       PULL_MODE=NONE BANK_VCCIO=3.3;
+IO_PORT "host_rx"   PULL_MODE=UP   DRIVE=OFF BANK_VCCIO=3.3;
+IO_PORT "host_tx"   PULL_MODE=NONE DRIVE=8   BANK_VCCIO=3.3;
+IO_PORT "servo_tx"  PULL_MODE=NONE DRIVE=8   BANK_VCCIO=3.3;
+IO_PORT "servo_rx"  PULL_MODE=UP   DRIVE=OFF BANK_VCCIO=3.3;
+IO_PORT "led_done"  PULL_MODE=NONE DRIVE=8   BANK_VCCIO=3.3;
+IO_PORT "led_ready" PULL_MODE=NONE DRIVE=8   BANK_VCCIO=3.3;

@@ -1,0 +1,36 @@
+// clk / LEDs / button: same as previous lessons.
+// Servo bus: TX and RX are two FPGA pins joined OUTSIDE the chip, each
+// through its own 1k resistor, at the single SIG wire. See the wiring
+// diagram in the lesson notes.
+//
+// Both resistors are load-bearing:
+//   servo_tx  1k -> bounds contention current if both ends drive at once
+//   servo_rx  1k -> limits ESD-clamp current if SIG ever exceeds 3.3 V
+//
+// G5/F5 are reused from the motor lesson, where their positions on the
+// bottom-right 6x2 header were confirmed against the dock's underside
+// silkscreen (F5 top row, G5 directly below).
+
+IO_LOC "clk"       E2;
+IO_LOC "key"       H11;   // dock button S1 -- position command sequence
+IO_LOC "key2"      H10;   // dock button S2 -- toggle continuous spin
+IO_LOC "led_done"  D7;
+IO_LOC "led_ready" E8;
+IO_LOC "servo_tx"  G5;
+IO_LOC "servo_rx"  F5;
+
+IO_PORT "clk"       PULL_MODE=NONE BANK_VCCIO=3.3;
+IO_PORT "key"       PULL_MODE=DOWN DRIVE=OFF BANK_VCCIO=3.3;
+IO_PORT "key2"      PULL_MODE=DOWN DRIVE=OFF BANK_VCCIO=3.3;
+IO_PORT "led_done"  PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;
+IO_PORT "led_ready" PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;
+
+// A UART idles HIGH, and idle-high is also what releases a shared bus.
+// DRIVE=8 is plenty through a 1k series resistor at 1 Mbaud.
+IO_PORT "servo_tx"  PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;
+
+// Pull-UP on the receive pin, deliberately. With the servo unplugged the
+// SIG wire is undriven; without the pull the pin floats and the receiver
+// sees noise as a stream of start bits. Pulling up mimics an idle bus, so
+// an absent servo reads as "quiet" and produces a clean timeout.
+IO_PORT "servo_rx"  PULL_MODE=UP DRIVE=OFF BANK_VCCIO=3.3;
