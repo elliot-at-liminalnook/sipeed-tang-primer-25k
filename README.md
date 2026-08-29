@@ -13,9 +13,14 @@ control — plus a labelled photo reference for the parts on the bench.
 | `motor/` | DC motor speed control: input synchroniser, debouncer, edge detector, 20 kHz PWM |
 | `servo/` | Hiwonder HX-30HM bus servo: 1 Mbaud UART, packet framing and checksums, owning a shared half-duplex wire |
 
-`servo/daisy-chain.md` covers what changes when three servos share one bus —
-ID assignment, the connector current limit that caps a power daisy-chain, and
-SYNC WRITE for simultaneous motion.
+Two design notes live alongside that lesson:
+
+- `servo/daisy-chain.md` — what changes when three servos share one bus: ID
+  assignment, the connector current limit that caps a power daisy-chain, and
+  SYNC WRITE for simultaneous motion.
+- `servo/nn-control.md` — driving the servos from a neural network over
+  WiFi via an ESP32: where the control tick and safety envelope belong, the
+  link protocol, and why the tethered path comes first.
 
 Each lesson has the same shape:
 

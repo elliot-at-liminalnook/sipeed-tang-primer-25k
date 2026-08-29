@@ -10,6 +10,10 @@
 *.vvp
 *.vcd
 
+# ESP-IDF generated output and machine-local resolved configuration.
+esp32/firmware/build/
+esp32/firmware/sdkconfig
+
 # Sipeed's upstream example repo — cloned separately, not vendored here:
 #   git clone https://github.com/sipeed/TangPrimer-25K-example
 TangPrimer-25K-example/

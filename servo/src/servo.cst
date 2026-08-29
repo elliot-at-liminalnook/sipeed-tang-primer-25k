@@ -12,12 +12,14 @@
 // silkscreen (F5 top row, G5 directly below).
 
 IO_LOC "clk"       E2;
-IO_LOC "key"       H11;   // dock button S1 -- position command sequence
-IO_LOC "key2"      H10;   // dock button S2 -- toggle continuous spin
+IO_LOC "key"       H11;   // dock S1 -- double-click direction / hold to jog
+IO_LOC "key2"      H10;   // dock S2 -- emergency stop only
 IO_LOC "led_done"  D7;
 IO_LOC "led_ready" E8;
 IO_LOC "servo_tx"  G5;
 IO_LOC "servo_rx"  F5;
+IO_LOC "host_rx"   B3;   // dock FT2232 channel-B UART -> FPGA
+IO_LOC "host_tx"   C3;   // dock FT2232 channel-B UART -> computer
 
 IO_PORT "clk"       PULL_MODE=NONE BANK_VCCIO=3.3;
 IO_PORT "key"       PULL_MODE=DOWN DRIVE=OFF BANK_VCCIO=3.3;
@@ -34,3 +36,5 @@ IO_PORT "servo_tx"  PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;
 // sees noise as a stream of start bits. Pulling up mimics an idle bus, so
 // an absent servo reads as "quiet" and produces a clean timeout.
 IO_PORT "servo_rx"  PULL_MODE=UP DRIVE=OFF BANK_VCCIO=3.3;
+IO_PORT "host_rx"   PULL_MODE=UP DRIVE=OFF BANK_VCCIO=3.3;
+IO_PORT "host_tx"   PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;

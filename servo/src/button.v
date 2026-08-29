@@ -12,8 +12,8 @@
 //     level only once it has held steady for DEBOUNCE_CYC cycles; any
 //     chatter restarts the timer.
 //
-//  3. EDGE DETECTOR - `pressed` is one cycle long on the 0->1 transition,
-//     however long the button is held down.
+//  3. EDGE DETECTOR - `pressed` and `released` are one cycle long on the
+//     corresponding transitions, however long the button is held down.
 //
 // Buttons on this dock are ACTIVE HIGH with an internal pull-down, so idle
 // is 0 and the reset state matches.
@@ -25,7 +25,8 @@ module button #(
     input  wire rst,
     input  wire raw,          // straight off the pin
     output reg  state,        // debounced level
-    output wire pressed       // one-cycle pulse on press
+    output wire pressed,      // one-cycle pulse on press
+    output wire released      // one-cycle pulse on release
 );
 
     reg [1:0] sync = 2'b00;
@@ -53,5 +54,6 @@ module button #(
         else     state_d <= state;
 
     assign pressed = ~state_d & state;
+    assign released = state_d & ~state;
 
 endmodule

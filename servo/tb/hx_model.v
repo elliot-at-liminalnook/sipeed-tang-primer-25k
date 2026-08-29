@@ -49,12 +49,24 @@ module hx_model #(
     integer    k;
     initial begin
         for (k = 0; k < 256; k = k + 1) mem[k] = 8'h00;
-        mem[8'h05] = 8'd1;          // ID
+        mem[8'h05] = ID;            // ID
         mem[8'h06] = 8'd0;          // baud index 0 = 1 Mbaud
+        mem[8'h08] = 8'd1;          // reply to reads and writes
+        mem[8'h0D] = 8'd70;         // 70 C protection threshold
+        mem[8'h13] = 8'd100;        // maximum torque, percent
+        mem[8'h14] = 8'h1F;         // protection sources enabled
+        mem[8'h1F] = 8'hB8;         // 3000 mA current limit
+        mem[8'h20] = 8'h0B;
         mem[8'h38] = 8'h00;         // current position low
         mem[8'h39] = 8'h00;         // current position high
-        mem[8'h3E] = 8'd111;        // voltage, 0.1 V units -> 11.1 V
+        mem[8'h3A] = 8'd23;         // current speed
+        mem[8'h3C] = 8'd45;         // current load
+        mem[8'h3E] = 8'h5C;         // 11100 mV (special-cased below)
         mem[8'h3F] = 8'd32;         // temperature, degrees C
+        mem[8'h41] = 8'd0;          // no protection fault
+        mem[8'h42] = 8'd0;          // stopped
+        mem[8'h45] = 8'h41;         // 321 mA
+        mem[8'h46] = 8'h01;
     end
 
     // --- line level ------------------------------------------------------
@@ -140,8 +152,17 @@ module hx_model #(
                                 8'h02: begin                   // READ
                                     addr = pbuf[0];
                                     len  = pbuf[1];
-                                    for (i = 0; i < len; i = i + 1)
-                                        rbuf[i] = mem[(addr + i) & 8'hFF];
+                                    // The real device exposes voltage as a
+                                    // two-byte virtual register at 0x3E while
+                                    // also exposing temperature at 0x3F. It is
+                                    // therefore not a flat byte-addressed pair.
+                                    if (addr == 8'h3E && len == 2) begin
+                                        rbuf[0] = 8'h5C; // 11100 mV
+                                        rbuf[1] = 8'h2B;
+                                    end else begin
+                                        for (i = 0; i < len; i = i + 1)
+                                            rbuf[i] = mem[(addr + i) & 8'hFF];
+                                    end
                                     rn = len;
                                     $display("  [model] READ  addr=%02h len=%0d", addr, len);
                                 end

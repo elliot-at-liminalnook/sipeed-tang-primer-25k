@@ -1,0 +1,18 @@
+// Host link, tethered phase: the dock's FT2232 channel-B UART.
+//
+// B3/C3 are taken from Sipeed's own UART/simple_uart example, same as
+// bridge.cst. When the ESP32 replaces the tether it drives these same two
+// pins -- but only ONE of them may be connected at a time, since the FT2232
+// drives host_rx continuously and would contend with the ESP32.
+
+IO_LOC "clk"       E2;
+IO_LOC "host_rx"   B3;
+IO_LOC "host_tx"   C3;
+IO_LOC "led_done"  D7;
+IO_LOC "led_ready" E8;
+
+IO_PORT "clk"       PULL_MODE=NONE BANK_VCCIO=3.3;
+IO_PORT "host_rx"   PULL_MODE=UP   DRIVE=OFF BANK_VCCIO=3.3;
+IO_PORT "host_tx"   PULL_MODE=NONE DRIVE=8   BANK_VCCIO=3.3;
+IO_PORT "led_done"  PULL_MODE=NONE DRIVE=8   BANK_VCCIO=3.3;
+IO_PORT "led_ready" PULL_MODE=NONE DRIVE=8   BANK_VCCIO=3.3;

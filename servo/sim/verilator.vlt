@@ -1,0 +1,21 @@
+`verilator_config
+// Waivers for this project.
+//
+// PROCASSINIT: these modules carry BOTH a declaration initialiser and a
+// synchronous reset, deliberately. The initialiser gives a defined power-on
+// state on the real GW5A (Gowin supports register init values), which the
+// earlier lessons rely on; the reset covers everything after that. The two
+// are complementary, not redundant.
+lint_off -rule PROCASSINIT
+
+// WIDTHEXPAND: the idiom `counter == PARAM - 1` compares an N-bit counter
+// against a 32-bit constant expression. Safe here because every such counter
+// is declared $clog2(PARAM+1) wide, so it can represent PARAM-1 exactly; the
+// LHS simply zero-extends. Sizing each literal by hand would churn the uart
+// modules that the earlier lessons already depend on.
+lint_off -rule WIDTHEXPAND
+
+// Each independently buildable FPGA image calls its board-level module `top`,
+// and intentionally unused optional button outputs are connected explicitly.
+lint_off -rule DECLFILENAME
+lint_off -rule PINCONNECTEMPTY
